@@ -29,7 +29,7 @@ const tlsHandshakeTimeout = 10 * time.Second
 type Proxy struct {
 	// address the proxy listens to
 	addr      net.Addr
-	transport http.RoundTripper
+	Transport http.RoundTripper
 	listener  net.Listener
 
 	// dial is a function for creating net.Conn
@@ -54,7 +54,7 @@ type Proxy struct {
 func NewProxy(config Config) *Proxy {
 	proxy := &Proxy{
 		Config: config,
-		transport: &http.Transport{
+		Transport: &http.Transport{
 			// This forces http.Transport to not upgrade requests to HTTP/2
 			// TODO: Remove when HTTP/2 can be supported
 			TLSNextProto:          make(map[string]func(string, *tls.Conn) http.RoundTripper),
@@ -265,7 +265,7 @@ func (p *Proxy) handleRequest(ctx *Context) error {
 		// not a CONNECT request, processing HTTP request
 		// res body is closed below (see session.res.body.Close())
 		// nolint:bodyclose
-		res, err := p.transport.RoundTrip(session.req)
+		res, err := p.Transport.RoundTrip(session.req)
 		if err != nil {
 			log.Error("id=%s: failed to round trip: %v", session.ID(), err)
 			p.raiseOnError(session, err)
